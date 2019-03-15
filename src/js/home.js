@@ -19,9 +19,11 @@ fetch('https://randomuser.me/api/')
     const $modalTitle = $modal.querySelector('h1')
     const $modalImg = $modal.querySelector('img')
     const $modalDescription = $modal.querySelector('p')
-    const actionList = await getData('https://yts.am/api/v2/list_movies.json?genre=action');
-    const dramaList = await getData('https://yts.am/api/v2/list_movies.json?genre=drama');
-    const animationList = await getData('https://yts.am/api/v2/list_movies.json?genre=animation');
+
+    const {data: { movies: actionList}} = await getData('https://yts.am/api/v2/list_movies.json?genre=action');
+    const {data: { movies: dramaList}} = await getData('https://yts.am/api/v2/list_movies.json?genre=drama');
+    const {data: { movies: animationList}} = await getData('https://yts.am/api/v2/list_movies.json?genre=animation');
+
     const $featuringContainer = document.getElementById('featuring')
 
     function setAttributes($element, attributes){
@@ -70,9 +72,9 @@ fetch('https://randomuser.me/api/')
     const $dramaContainer = document.getElementById('drama');
     const $animationContainer = document.getElementById('animation');
 
-    function templateItemsVideo(movie){
+    function templateItemsVideo(movie, category){
         return (
-            `<div class="primaryPlaylistItem">
+            `<div class="primaryPlaylistItem" data-id="${movie.id}" data-category="${category}" >
                 <div class="primaryPlaylistItem-image">
                     <img src="${movie.medium_cover_image}">
                 </div>
@@ -95,9 +97,35 @@ fetch('https://randomuser.me/api/')
         })
     }
 
+    function findById(list, id){
+        return list.find(movie => movie.id === parseInt(id,10))
+    }
+    function findMovie(id, category){
+        switch(category){
+            case 'action':
+                return findById(actionList,id)
+                break;
+            
+            case 'drama':
+                return findById(dramaList,id)
+                break;
+
+            default:
+                return findById(animationList,id)
+                break;
+        }
+    }
+
     function showModal($element){
         $overlay.classList.add('active')
         $modal.style.animation = 'modalIn .8s forwards'
+        const id = $element.dataset.id
+        const category = $element.dataset.category
+        const data = findMovie(id, category)
+
+        $modalTitle.textContent = data.title
+        $modalImg.setAttribute('src',data.medium_cover_image)
+        $modalDescription.textContent = data.description_full
     }
 
     function hideModal(){
@@ -105,10 +133,11 @@ fetch('https://randomuser.me/api/')
         $modal.style.animation = 'modalOut .8s forwards'
     }
     $hideModal.addEventListener('click', hideModal)
-    function renderMovieList(list,$container){
+
+    function renderMovieList(list,$container,category){
         $container.children[0].remove()
         list.forEach(movie => {
-            const HTMLString = templateItemsVideo(movie);
+            const HTMLString = templateItemsVideo(movie,category);
             const movieElement = createTemplate(HTMLString);
             
             //debugger
@@ -117,7 +146,7 @@ fetch('https://randomuser.me/api/')
             //$actionContainer.innerHTML += HTMLString
         });
     }
-    renderMovieList(actionList.data.movies,$actionContainer)
-    renderMovieList(dramaList.data.movies,$dramaContainer)
-    renderMovieList(animationList.data.movies,$animationContainer)
+    renderMovieList(actionList,$actionContainer,'action')
+    renderMovieList(dramaList,$dramaContainer,'drama')
+    renderMovieList(animationList,$animationContainer,'animation')
 })()
