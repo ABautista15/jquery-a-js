@@ -7,7 +7,10 @@ fetch('https://randomuser.me/api/')
     async function getData(url){
         const response = await fetch(url);
         const data = await response.json();
-        return data;
+        if(data.data.movie_count > 0){
+            return data;
+        }
+        throw new Error("don't found any results");
     }
     const BASE_URL = 'https://yts.am/api/v2/'
     const $form = document.getElementById('form')
@@ -20,9 +23,7 @@ fetch('https://randomuser.me/api/')
     const $modalImg = $modal.querySelector('img')
     const $modalDescription = $modal.querySelector('p')
 
-    const {data: { movies: actionList}} = await getData('https://yts.am/api/v2/list_movies.json?genre=action');
-    const {data: { movies: dramaList}} = await getData('https://yts.am/api/v2/list_movies.json?genre=drama');
-    const {data: { movies: animationList}} = await getData('https://yts.am/api/v2/list_movies.json?genre=animation');
+    
 
     const $featuringContainer = document.getElementById('featuring')
 
@@ -58,19 +59,22 @@ fetch('https://randomuser.me/api/')
         $featuringContainer.append($loader)
 
         const data = new FormData($form)
-        const {
-            data: {
-                movies
-            }
-        } = await getData(`${BASE_URL}list_movies.json?limit=1&query_term=${data.get('name')}`)
-        
-        const HTMLString = featuringTemplate(movies[0])
-        $featuringContainer.innerHTML = HTMLString
+        try{
+            const {
+                data: {
+                    movies
+                }
+            } = await getData(`${BASE_URL}list_movies.json?limit=1&query_term=${data.get('name')}`)
+            
+            const HTMLString = featuringTemplate(movies[0])
+            $featuringContainer.innerHTML = HTMLString
+        }catch(error){
+            alert(error.message)
+            $loader.remove()
+            $home.classList.remove('search-active')
+        }
 
     })
-    const $actionContainer = document.getElementById('action');
-    const $dramaContainer = document.getElementById('drama');
-    const $animationContainer = document.getElementById('animation');
 
     function templateItemsVideo(movie, category){
         return (
@@ -139,14 +143,33 @@ fetch('https://randomuser.me/api/')
         list.forEach(movie => {
             const HTMLString = templateItemsVideo(movie,category);
             const movieElement = createTemplate(HTMLString);
-            
-            //debugger
+            const images = movieElement.querySelector('img')
+
             $container.append(movieElement);
+
+            images.addEventListener('load', (event)=>{
+                event.srcElement.classList.add('fadeIn')
+            })
+            //debugger
+            
             addEventClick(movieElement)
             //$actionContainer.innerHTML += HTMLString
         });
     }
+    
+   
+    const {data: { movies: actionList}} = await getData('https://yts.am/api/v2/list_movies.json?genre=action');
+    window.localStorage.setItem('actionList',JSON.stringify(actionList))
+    const $actionContainer = document.getElementById('action');
     renderMovieList(actionList,$actionContainer,'action')
+
+    const {data: { movies: dramaList}} = await getData('https://yts.am/api/v2/list_movies.json?genre=drama');
+    window.localStorage.setItem('dramaList',JSON.stringify(dramaList))
+    const $dramaContainer = document.getElementById('drama');
     renderMovieList(dramaList,$dramaContainer,'drama')
+
+    const {data: { movies: animationList}} = await getData('https://yts.am/api/v2/list_movies.json?genre=animation');
+    window.localStorage.setItem('animationList',JSON.stringify(animationList))
+    const $animationContainer = document.getElementById('animation');
     renderMovieList(animationList,$animationContainer,'animation')
 })()
