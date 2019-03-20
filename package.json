@@ -1,0 +1,26 @@
+{
+  "name": "postcss",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ABautista15/jquery-a-js.git"
+  },
+  "author": "Adrian Bautista",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/ABautista15/jquery-a-js/issues"
+  },
+  "homepage": "https://github.com/ABautista15/jquery-a-js#readme",
+  "dependencies": {
+    "autoprefixer": "^9.5.0",
+    "postcss-apply": "^0.12.0",
+    "postcss-cli": "^6.1.2",
+    "postcss-custom-properties": "^8.0.9",
+    "postcss-preset-env": "^6.6.0"
+  }
+}

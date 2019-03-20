@@ -2,12 +2,33 @@ body {
   margin: 0;
   font-family: 'Lato', sans-serif;
 }
-
-
+:root{
+  --darkColor: #15192a;
+  --lightColor: white;
+  --warningColor: red;
+  --button: {
+    border: 1px solid var(--lightColor);
+    border-radius: 5px;
+    background: var(--darkColor);
+    color: var(--lightColor);
+    padding: .5em 2em;
+    text-transform: uppercase;
+    font-size: 14px;
+    cursor: pointer;
+    border-bottom: 5px solid var(--lightColor);
+  };
+}
+.btn{
+  @apply --button;
+}
+.btn.warning{
+  background: var(--warningColor);
+}
 /*home layout*/
 .home {
+  background: var(--lightColor);
   display: grid;
-  height: 100vh;
+  height: calc(50vh * 2);
   grid-template-columns: 350px 1fr;
   grid-template-rows: 1fr 0;
   grid-template-areas: "sidebar primary"
