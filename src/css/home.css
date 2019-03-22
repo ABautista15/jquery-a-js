@@ -247,7 +247,10 @@ body {
   padding-left: 100px;
   color: white;
 }
-
+.myPlaylist :any-link:hover{
+  transform: scale(1.1);
+  color: red;
+}
 .featuring-image {
   margin-right: 20px;
 }
@@ -272,5 +275,13 @@ body {
 
   100% {
     opacity: 1;
+  }
+}
+
+@custom-media --small-viewport screen and (width < 480px);
+
+ @media (--small-viewport){
+  .home{
+    grid-template-columns: 1fr;
   }
 }
